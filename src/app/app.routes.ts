@@ -2,16 +2,17 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    // Redirect the root path to /plan so the plan is the default view
+    // Plan is the home page, served at the root path
     path: '',
-    redirectTo: 'plan',
-    pathMatch: 'full',
-  },
-  {
-    path: 'plan',
     loadComponent: () =>
       import('./plan/plan').then((m) => m.PlanComponent),
-    title: 'Plan – Meal Planner',
+    title: 'Meal Planner',
+  },
+  {
+    // Keep /plan as an alias that redirects to root
+    path: 'plan',
+    redirectTo: '',
+    pathMatch: 'full',
   },
   {
     path: 'meals',
