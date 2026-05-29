@@ -462,18 +462,18 @@ describe('ShoppingListComponent', () => {
       expect(result).toContain('Mon');
     });
 
-    it('includes the zero-padded month and day', () => {
+    it('includes the zero-padded day and month in DD/MM order', () => {
       const { component } = setup();
-      // 2026-06-01 → "06/01"
+      // 2026-06-01 → "01/06"
       const result = component.formatLatestDate(new Date(2026, 5, 1));
-      expect(result).toContain('06/01');
+      expect(result).toContain('01/06');
     });
 
-    it('zero-pads single-digit months and days', () => {
+    it('zero-pads single-digit days and months', () => {
       const { component } = setup();
-      // 2026-09-05 → "09/05"
+      // 2026-09-05 → "05/09"
       const result = component.formatLatestDate(new Date(2026, 8, 5));
-      expect(result).toContain('09/05');
+      expect(result).toContain('05/09');
     });
   });
 });

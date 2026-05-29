@@ -292,15 +292,15 @@ export class ShoppingListComponent implements OnInit {
 
   /**
    * Formats the latest date an ingredient is needed as a short
-   * weekday + MM/DD string, e.g. "Wed 06/04".
+   * weekday + DD/MM string, e.g. "Wed 04/06".
    *
    * This gives the shopper a quick reference for choosing a suitable
    * use-by date when purchasing the ingredient.
    */
   formatLatestDate(date: Date): string {
-    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const weekday = date.toLocaleDateString('en-GB', { weekday: 'short' });
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
-    return `${weekday} ${mm}/${dd}`;
+    return `${weekday} ${dd}/${mm}`;
   }
 }

@@ -741,12 +741,12 @@ describe('PlanComponent', () => {
   // ── formatEntryDates() ─────────────────────────────────────────────
 
   describe('formatEntryDates()', () => {
-    it('formats a single date in long form (weekday, MM/DD/YYYY)', () => {
+    it('formats a single date in long form (weekday, DD/MM/YYYY)', () => {
       const { component } = setup();
       // Monday 1 June 2026
       const result = component.formatEntryDates([new Date(2026, 5, 1)]);
       expect(result).toMatch(/Monday/);
-      expect(result).toMatch(/06\/01\/2026/);
+      expect(result).toMatch(/01\/06\/2026/);
     });
 
     it('formats two dates as an abbreviated range with an en-dash', () => {
@@ -757,13 +757,13 @@ describe('PlanComponent', () => {
       expect(result).toContain('–');
     });
 
-    it('abbreviated range includes both dates in MM/DD format', () => {
+    it('abbreviated range includes both dates in DD/MM format', () => {
       const { component } = setup();
-      const d1 = new Date(2026, 5, 1); // 06/01
-      const d2 = new Date(2026, 5, 2); // 06/02
+      const d1 = new Date(2026, 5, 1); // 01/06
+      const d2 = new Date(2026, 5, 2); // 02/06
       const result = component.formatEntryDates([d1, d2]);
-      expect(result).toMatch(/06\/01/);
-      expect(result).toMatch(/06\/02/);
+      expect(result).toMatch(/01\/06/);
+      expect(result).toMatch(/02\/06/);
     });
   });
 

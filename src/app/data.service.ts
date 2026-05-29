@@ -75,7 +75,7 @@ function writeCache(key: string, value: unknown): void {
 
 /**
  * DataService loads and parses the application's YAML data files
- * (meals.yaml and ingredients.yaml) from the `/data/` static asset
+ * (meals.yaml and ingredients.yaml) from the `data/` static asset
  * directory.  Each method returns a cold Observable that fetches the
  * relevant file on subscription, applying automatic exponential
  * back-off retries on network failure.
@@ -85,7 +85,7 @@ export class DataService {
   private readonly http = inject(HttpClient);
 
   /**
-   * Fetches and parses `/data/meals.yaml`, returning an array of
+   * Fetches and parses `data/meals.yaml`, returning an array of
    * {@link Meal} objects with typed, flattened ingredient lists.
    *
    * On a successful fetch the parsed result is written to localStorage
@@ -96,7 +96,7 @@ export class DataService {
    */
   getMeals(): Observable<Meal[]> {
     return this.http
-      .get('/data/meals.yaml', { responseType: 'text' })
+      .get('data/meals.yaml', { responseType: 'text' })
       .pipe(
         withRetry(),
         map((text) => {
@@ -142,7 +142,7 @@ export class DataService {
   }
 
   /**
-   * Fetches and parses `/data/ingredients.yaml`, returning a flat
+   * Fetches and parses `data/ingredients.yaml`, returning a flat
    * array of {@link IngredientDefinition} objects sorted alphabetically
    * by name within each section.
    *
@@ -151,7 +151,7 @@ export class DataService {
    */
   getIngredients(): Observable<IngredientDefinition[]> {
     return this.http
-      .get('/data/ingredients.yaml', { responseType: 'text' })
+      .get('data/ingredients.yaml', { responseType: 'text' })
       .pipe(
         withRetry(),
         map((text) => {

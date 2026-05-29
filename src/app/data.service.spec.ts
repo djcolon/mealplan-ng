@@ -66,21 +66,21 @@ describe('DataService', () => {
     it('returns the correct number of meals', () => {
       let result: ReturnType<typeof Array.prototype.slice> = [];
       service.getMeals().subscribe((m) => (result = m));
-      httpTesting.expectOne('/data/meals.yaml').flush(MEALS_YAML);
+      httpTesting.expectOne('data/meals.yaml').flush(MEALS_YAML);
       expect(result).toHaveLength(2);
     });
 
     it('parses meal titles', () => {
       let result: any[] = [];
       service.getMeals().subscribe((m) => (result = m));
-      httpTesting.expectOne('/data/meals.yaml').flush(MEALS_YAML);
+      httpTesting.expectOne('data/meals.yaml').flush(MEALS_YAML);
       expect(result[0].title).toBe('Pasta');
     });
 
     it('maps ingredient entries to name/quantity pairs', () => {
       let result: any[] = [];
       service.getMeals().subscribe((m) => (result = m));
-      httpTesting.expectOne('/data/meals.yaml').flush(MEALS_YAML);
+      httpTesting.expectOne('data/meals.yaml').flush(MEALS_YAML);
       expect(result[0].ingredients).toEqual([
         { name: 'Pasta', quantity: 200 },
         { name: 'Olive oil', quantity: 1 },
@@ -90,7 +90,7 @@ describe('DataService', () => {
     it('reads tags from the YAML', () => {
       let result: any[] = [];
       service.getMeals().subscribe((m) => (result = m));
-      httpTesting.expectOne('/data/meals.yaml').flush(MEALS_YAML);
+      httpTesting.expectOne('data/meals.yaml').flush(MEALS_YAML);
       expect(result[1].tags).toContain('leftovers');
     });
 
@@ -102,7 +102,7 @@ describe('DataService', () => {
       service.getMeals().subscribe({
         error: (e: Error) => (err = e),
       });
-      httpTesting.expectOne('/data/meals.yaml').flush(BAD_MEALS_YAML);
+      httpTesting.expectOne('data/meals.yaml').flush(BAD_MEALS_YAML);
       expect(err?.message).toContain('"meals"');
     });
   });
@@ -114,7 +114,7 @@ describe('DataService', () => {
       let result: any[] = [];
       service.getIngredients().subscribe((i) => (result = i));
       httpTesting
-        .expectOne('/data/ingredients.yaml')
+        .expectOne('data/ingredients.yaml')
         .flush(INGREDIENTS_YAML);
       expect(result).toHaveLength(2);
     });
@@ -123,7 +123,7 @@ describe('DataService', () => {
       let result: any[] = [];
       service.getIngredients().subscribe((i) => (result = i));
       httpTesting
-        .expectOne('/data/ingredients.yaml')
+        .expectOne('data/ingredients.yaml')
         .flush(INGREDIENTS_YAML);
       const pasta = result.find((i: any) => i.name === 'Pasta');
       expect(pasta?.unit).toBe('g');
@@ -134,7 +134,7 @@ describe('DataService', () => {
       let result: any[] = [];
       service.getIngredients().subscribe((i) => (result = i));
       httpTesting
-        .expectOne('/data/ingredients.yaml')
+        .expectOne('data/ingredients.yaml')
         .flush(INGREDIENTS_YAML);
       const apple = result.find((i: any) => i.name === 'Apple');
       expect(apple?.unit).toBeUndefined();
@@ -149,7 +149,7 @@ describe('DataService', () => {
         error: (e: Error) => (err = e),
       });
       httpTesting
-        .expectOne('/data/ingredients.yaml')
+        .expectOne('data/ingredients.yaml')
         .flush(BAD_INGREDIENTS_YAML);
       expect(err?.message).toContain('"ingredients"');
     });

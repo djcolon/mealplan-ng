@@ -51,23 +51,23 @@ function pad2(n: number): string {
 }
 
 /**
- * Formats a Date as a full day label using MM/DD/YYYY.
- * Example: "Monday, 06/01/2026"
+ * Formats a Date as a full day label using DD/MM/YYYY.
+ * Example: "Monday, 01/06/2026"
  */
 function longDay(d: Date): string {
   const mm = pad2(d.getMonth() + 1);
   const dd = pad2(d.getDate());
   const yyyy = d.getFullYear();
-  const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
-  return `${weekday}, ${mm}/${dd}/${yyyy}`;
+  const weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
+  return `${weekday}, ${dd}/${mm}/${yyyy}`;
 }
 
 /**
- * Formats a Date as MM/DD for use in compact date-range strings.
- * Example: "06/01"
+ * Formats a Date as DD/MM for use in compact date-range strings.
+ * Example: "01/06"
  */
 function shortDay(d: Date): string {
-  return `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())}`;
+  return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}`;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -488,8 +488,8 @@ export class PlanComponent implements OnInit {
   }
 
   /**
-   * Returns the date formatted as MM/DD.
-   * Example: "06/01"
+   * Returns the date formatted as DD/MM.
+   * Example: "01/06"
    */
   shortDate(d: Date): string {
     return shortDay(d);
