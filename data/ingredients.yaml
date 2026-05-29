@@ -1,0 +1,462 @@
+# This file contains all possible ingredients.
+# It uses the section to organise the shopping list.
+# The unit is used to sum up quantities of the same ingredient.
+# If no unit is given, the unit is assumed to be "each".
+
+ingredients:
+  Ale:
+    unit: ml
+    section: Drinks
+  Apple:
+    section: Produce
+  Asparagus:
+    unit: g
+    section: Produce
+  Aubergine:
+    section: Produce
+  BBQ sauce:
+    unit: ml
+    section: Pantry
+  Balsamic or red wine vinegar:
+    unit: ml
+    section: Pantry
+  Barley:
+    unit: g
+    section: Pantry
+  Basil:
+    unit: tsp
+    section: Pantry
+  Beef (Burgers):
+    section: Refigerated
+  Beef (diced):
+    unit: g
+    section: Refigerated
+  Beef (mince):
+    unit: g
+    section: Refigerated
+  Beef (sausage):
+    section: Refigerated
+  Beetroot:
+    section: Produce
+  Black beans:
+    unit: g
+    section: Pantry
+  Black pepper:
+    unit: tsp
+    section: Pantry
+  Boursin:
+    section: Refigerated
+  Bread:
+    section: Bakery
+  Bread crumbs:
+    unit: g
+    section: Pantry
+  Brie:
+    unit: g
+    section: Refigerated
+  Broad beans:
+    unit: g
+    section: Frozen
+  Broccoli:
+    section: Produce
+  Burger buns:
+    section: Bakery
+  Butter:
+    unit: g
+    section: Refigerated
+  Cajun seasoning:
+    unit: tsp
+    section: Pantry
+  Carrots:
+    section: Produce
+  Caster sugar:
+    unit: g
+    section: Pantry
+  Celery:
+    section: Produce
+  Cheddar:
+    unit: g
+    section: Refigerated
+  Cheese:
+    unit: g
+    section: Refigerated
+  Cherry tomatoes:
+    section: Produce
+  Chicken (breasts):
+    section: Refigerated
+  Chicken (burgers):
+    section: Freezer
+  Chicken (thighs):
+    unit: g
+    section: Refigerated
+  Chicken Kiev:
+    section: Freezer
+  Chicken pie:
+    section: Refrigerated
+  Chilli pepper:
+    section: Produce
+  Chilli relish:
+    unit: ml
+    section: Pantry
+  Chipotle chilli paste:
+    unit: g
+    section: Pantry
+  Chips:
+    unit: g
+    section: Freezer
+  Chips (frozen):
+    section: Freezer
+  Chives:
+    unit: g
+    section: Pantry
+  Chorizo pack:
+    section: Refigerated
+  Cider:
+    unit: ml
+    section: Drinks
+  Coriander (fresh):
+    section: Produce
+  Coriander (ground):
+    unit: tsp
+    section: Pantry
+  Coriander leaves:
+    section: Produce
+  Corn tortillas:
+    section: Pantry
+  Courgette:
+    section: Produce
+  Creme fraiche:
+    unit: ml
+    section: Refigerated
+  Crisps (big bag):
+    section: Pantry
+  Crisps (small bags):
+    section: Pantry
+  Crispy onions:
+    unit: g
+    section: Pantry
+  Crusty bread:
+    section: Bakery
+  Cucumber:
+    section: Produce
+  Cumin:
+    unit: tsp
+    section: Pantry
+  Curry sauce:
+    section: Pantry
+  Diced beef:
+    unit: g
+    section: Refigerated
+  Diced chorizo:
+    unit: g
+    section: Refigerated
+  Diced lamb:
+    unit: g
+    section: Refigerated
+  Diced pork:
+    unit: g
+    section: Refigerated
+  Dried fruit:
+    unit: g
+    section: Pantry
+  Dried herbs:
+    unit: tsp
+    section: Pantry
+  Dried lasagne:
+    unit: g
+    section: Pantry
+  Egg:
+    section: Pantry
+  Feta:
+    unit: g
+    section: Refigerated
+  Flour:
+    unit: g
+    section: Pantry
+  Flour (plain):
+    unit: g
+    section: Pantry
+  French beans:
+    unit: g
+    section: Produce
+  Fresh bread:
+    section: Bakery
+  Garlic:
+    unit: cloves
+    section: Produce
+  Gnocchi:
+    unit: g
+    section: Pantry
+  Gouda:
+    unit: g
+    section: Refigerated
+  Grapes:
+    section: Produce
+  Grated mozzerella:
+    unit: g
+    section: Refigerated
+  Gravy:
+    section: Pantry
+  Green beans:
+    unit: g
+    section: Produce
+  Haddock (frozen):
+    unit: g
+    section: Freezer
+  Ham:
+    unit: g
+    section: Refigerated
+  Honey mustard dressing:
+    unit: ml
+    section: Pantry
+  Lamb steaks:
+    section: Refigerated
+  Lasagna sheets:
+    unit: g
+    section: Pantry
+  Leek:
+    section: Produce
+  Leeks kg:
+    unit: kg
+    section: Produce
+  Lettuce:
+    section: Produce
+  Lettuce/salad leaves:
+    section: Produce
+  Lime juice:
+    unit: ml
+    section: Pantry
+  Long-grain rice:
+    unit: g
+    section: Pantry
+  Mango chutney:
+    unit: ml
+    section: Pantry
+  Mascarpone:
+    unit: g
+    section: Refigerated
+  Mayonnaise:
+    unit: ml
+    section: Pantry
+  Meatballs:
+    section: Refigerated
+  Mild chilli powder:
+    unit: tsp
+    section: Pantry
+  Milk:
+    unit: l
+    section: Refigerated
+  Mixed herbs:
+    unit: tsp
+    section: Pantry
+  Mushroom soup:
+    unit: ml
+    section: Pantry
+  Mushrooms:
+    unit: g
+    section: Produce
+  Mustard:
+    unit: tsp
+    section: Pantry
+  Mustard seeds:
+    unit: tsp
+    section: Pantry
+  Naan bread:
+    section: Bakery
+  Noodles:
+    unit: g
+    section: Pantry
+  Nutmeg:
+    unit: tsp
+    section: Pantry
+  Olive oil:
+    unit: ml
+    section: Pantry
+  Olives:
+    unit: g
+    section: Pantry
+  Onion:
+    section: Produce
+  Onion chutney:
+    section: Pantry
+  Oregano:
+    unit: tsp
+    section: Pantry
+  Paprika:
+    unit: tsp
+    section: Pantry
+  Parmesan:
+    unit: g
+    section: Refigerated
+  Parsley:
+    unit: tsp
+    section: Pantry
+  Parsley (fresh):
+    section: Produce
+  Part-baked baguette:
+    section: Bakery
+  Passata:
+    unit: ml
+    section: Pantry
+  Pasta:
+    unit: g
+    section: Pantry
+  Peanut butter:
+    unit: g
+    section: Pantry
+  Peanuts:
+    unit: g
+    section: Pantry
+  Peas (frozen):
+    unit: g
+    section: Frozen
+  Peppers:
+    section: Produce
+  Pizza:
+    section: Freezer
+  Pork (mince):
+    unit: g
+    section: Refigerated
+  Pork (sausage):
+    section: Refigerated
+  Potato:
+    unit: g
+    section: Produce
+  Potatoes:
+    section: Produce
+  Quiche:
+    section: Refigerated
+  Red lentils:
+    unit: g
+    section: Pantry
+  Red onion:
+    section: Produce
+  Red pepper:
+    section: Produce
+  Rice:
+    unit: g
+    section: Pantry
+  Ricotta:
+    unit: g
+    section: Refigerated
+  Rosemary:
+    unit: tsp
+    section: Pantry
+  Sage:
+    unit: tsp
+    section: Pantry
+  Salad tomatoes:
+    unit: pack
+    section: Produce
+  Salmon:
+    unit: g
+    section: Refigerated
+  Salt:
+    unit: tsp
+    section: Pantry
+  Self-raising flour:
+    unit: g
+    section: Pantry
+  Single cream:
+    unit: ml
+    section: Refigerated
+  Sliced chorizo:
+    section: Refigerated
+  Sour cream:
+    unit: ml
+    section: Refigerated
+  Spinach (fresh):
+    unit: g
+    section: Produce
+  Spinach (frozen):
+    unit: g
+    section: Freezer
+  Steak pies:
+    section: Refrigerator
+  Stir fry veg bag:
+    section: Produce
+  Stock:
+    unit: l
+    section: Pantry
+  Stock cube:
+    section: Pantry
+  Suet:
+    unit: g
+    section: Pantry
+  Swede:
+    section: Produce
+  Sweet chilli sauce:
+    unit: ml
+    section: Pantry
+  Sweet pepper:
+      section: Produce
+  Sweet potato:
+    unit: kg
+    section: Produce
+  Sweet potatoes:
+    section: Produce
+  Sweetcorn:
+    section: Pantry
+  Taco seasoning:
+    section: Pantry
+  Teriyaki sauce pouch:
+    unit: pouch
+    section: Pantry
+  Thyme:
+    unit: tsp
+    section: Pantry
+  Tinned tomatoes:
+    section: Pantry
+  Tinned tomatoes (400g):
+    section: Pantry
+  Tomate puree:
+    unit: ml
+    section: Pantry
+  Tomato:
+      section: Produce
+  Tomato ketchup:
+    unit: ml
+    section: Pantry
+  Tomato puree:
+    unit: ml
+    section: Pantry
+  Tomato soup:
+    unit: ml
+    section: Pantry
+  Tortelloni:
+    unit: g
+    section: Refigerated
+  Tortilla chips:
+    unit: g
+    section: Pantry
+  Tortilla wraps (8 pack):
+    unit: pack
+    section: Pantry
+  Tuna:
+    unit: can
+    section: Pantry
+  Turmeric:
+    unit: tsp
+    section: Pantry
+  Vegetable stock:
+    unit: ml
+    section: Pantry
+  Vinegar:
+    unit: ml
+    section: Pantry
+  Walnuts:
+    unit: g
+    section: Pantry
+  White stilton:
+    unit: g
+    section: Refigerated
+  Worcestershire sauce:
+    unit: ml
+    section: Pantry
+  Wraps:
+      section: Pantry
+  Yellow pepper:
+      section: Produce
+  Yoghurt:
+    unit: ml
+    section: Refigerated

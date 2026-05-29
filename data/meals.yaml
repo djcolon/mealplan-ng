@@ -1,0 +1,555 @@
+meals:
+- title: Jacket potatoes
+  ingredients:
+  - Sweet potatoes: 1
+  - Olive oil: 1
+  - Rosemary: 1
+  - Thyme: 1
+  - Salt: 1
+  - Tuna: 2
+  - Sweetcorn: 1
+  - Peas (frozen): 1
+  - Cheese: 1
+  - Butter: 1
+  - Chilli relish: 1
+- title: Chicken pasta green
+  ingredients:
+  - Pasta: 1
+  - Onion: 1
+  - Chicken (breasts): 2
+  - Mushrooms: 1
+  - Stock cube: 1
+  - Leek: 1
+  - Peas (frozen): 1
+  - Broad beans: 1
+  - Spinach (frozen): 1
+  - Olive oil: 1
+  - Boursin: 1
+- title: Steak pie
+  ingredients:
+  - Potatoes: 1
+  - Butter: 1
+  - Milk: 1
+  - Chives: 1
+  - Black pepper: 1
+  - Carrots: 1
+  - Peas (frozen): 1
+  - Gravy: 1
+  - Steak pies: 1
+- title: Vegetable pasta
+  ingredients:
+  - Pasta: 1
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 1
+  - Red pepper: 1
+  - Tinned tomatoes: 1
+  - Tomato puree: 1
+  - Courgette: 1
+  - Stock cube: 1
+- title: Beef Burgers
+  ingredients:
+  - Beef (Burgers): 4
+  - Burger buns: 4
+  - Mayonnaise: 1
+  - Cheese: 1
+  - Chips (frozen): 1
+  - Tomato: 1
+  - Lettuce/salad leaves: 1
+  - Cucumber: 1
+  - Brie: 1
+  - Walnuts: 1
+  - Grapes: 1
+  - Red onion: 1
+  - Chilli relish: 1
+  - Onion chutney: 1
+  - Honey mustard dressing: 1
+- title: Beef casserole
+  tags:
+  - leftovers
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Leek: 1
+  - Diced beef: 1
+  - Stock cube: 1
+  - Swede: 1
+  - Carrots: 1
+  - Mushrooms: 1
+  - Tinned tomatoes: 1
+  - Ale: 1
+  - Rosemary: 1
+  - Thyme: 1
+  - Suet: 1
+  - Self-raising flour: 1
+- title: Lamb steaks in cider
+  ingredients:
+  - Olive oil: 1
+  - Lamb steaks: 1
+  - Onion: 1
+  - Cider: 1
+  - Dried fruit: 1
+  - Apple: 1
+  - Potatoes: 1
+  - Milk: 1
+  - Butter: 1
+  - Chives: 1
+  - Flour: 1
+  - Garlic: 1
+  - Rosemary: 1
+  - Broccoli: 1
+- title: Chorizo & gnocchi bake
+  ingredients:
+  - Olive oil: 1
+  - Red onion: 2
+  - Garlic: 1
+  - Red pepper: 1
+  - Courgette: 1
+  - Tinned tomatoes: 1
+  - Tomato puree: 1
+  - Basil: 1
+  - Oregano: 1
+  - Chorizo pack: 1
+  - Gnocchi: 1
+  - Grated mozzerella: 1
+  - Lettuce: 1
+  - Tomato: 1
+  - Olives: 1
+  - Feta: 1
+  - Cucumber: 1
+- title: Sweet potatoes in peanut tomato sauce
+  ingredients:
+  - Olive oil: 1
+  - Sweet potato: 1
+  - Onion: 1
+  - Chilli pepper: 1
+  - Garlic: 2
+  - Salt: 1
+  - Peanut butter: 1
+  - Tinned tomatoes: 1
+  - Vegetable stock: 400
+  - Parsley: 1
+  - Peanuts: 50
+  - Bread: 1
+- title: Cheese toasties
+  ingredients:
+  - Bread: 1
+  - Gouda: 1
+  - Ham: 1
+  - Tomato soup: 1
+  - Tomato ketchup: 1
+  - Lettuce: 1
+  - Tomato: 1
+  - Cucumber: 1
+  - Beetroot: 1
+  - Egg: 2
+- title: Chicken stir fry
+  ingredients:
+  - Olive oil: 1
+  - Chicken (breasts): 1
+  - Stir fry veg bag: 1
+  - Teriyaki sauce pouch: 1
+  - Noodles: 1
+  - Onion: 1
+- title: Lasagna
+  tags:
+  - leftovers
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 1
+  - Salad tomatoes: 1
+  - Red pepper: 1
+  - Courgette: 1
+  - Passata: 1
+  - Beef (mince): 400
+  - Milk: 1
+  - Flour (plain): 1
+  - Cheese: 1
+  - Lasagna sheets: 1
+  - Tinned tomatoes: 1
+- title: Salmon
+  ingredients:
+  - Salmon: 1
+  - Chilli relish: 1
+  - Rice: 1
+  - French beans: 1
+  - Olive oil: 1
+  - Sweet chilli sauce: 1
+- title: Chicken burgers
+  ingredients:
+  - Chicken (burgers): 2
+  - Chips (frozen): 1
+  - Peas (frozen): 1
+  - Lettuce: 1
+  - Tomato: 1
+  - Mayonnaise: 1
+  - Burger buns: 1
+  - Chilli relish: 1
+- title: Fish, chips & Peas (frozen)
+  ingredients:
+  - Haddock (frozen): 1
+  - Chips (frozen): 1
+  - Peas (frozen): 1
+  - Mayonnaise: 1
+  - Vinegar: 1
+- title: Pork casserole
+  tags:
+  - leftovers
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Leek: 1
+  - Diced pork: 1
+  - Stock cube: 1
+  - Swede: 1
+  - Carrots: 1
+  - Mushrooms: 1
+  - Tinned tomatoes: 1
+  - Cider: 1
+  - Sage: 1
+- title: Lamb, leek & Barley stew
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Carrots: 1
+  - Celery: 1
+  - Diced lamb: 1
+  - Barley: 75
+  - Stock cube: 1
+  - Broccoli: 1
+  - Caster sugar: 1
+  - Leek: 1
+  - Parsley: 1
+  - Potatoes: 1
+  - Butter: 1
+  - Milk: 1
+- title: Cheesy Leek Soup
+  ingredients:
+  - Leeks kg: 1
+  - Stock cube: 2
+  - White stilton: 1
+  - Cheddar: 1
+  - Flour: 1
+  - Fresh bread: 1
+  - Single cream: 1
+  - Olive oil: 1
+  - Garlic: 1
+  - Mustard: 1
+- title: Quiche
+  ingredients:
+  - Quiche: 1
+  - Potatoes: 1
+  - Olive oil: 1
+  - Rosemary: 1
+  - Thyme: 1
+  - Green beans: 1
+- title: Hungarian goulash
+  tags:
+  - leftovers
+  ingredients:
+  - Olive oil: 1
+  - Red pepper: 1
+  - Yellow pepper: 1
+  - Diced beef: 1
+  - Paprika: 1
+  - Tinned tomatoes: 1
+  - Onion: 1
+  - Rice: 1
+  - Sour cream: 1
+- title: Shakshuka
+  ingredients:
+  - Olive oil: 1
+  - Red onion: 1
+  - Garlic: 2
+  - Cumin: 1
+  - Sweet pepper: 1
+  - Chilli pepper: 2
+  - Tinned tomatoes (400g): 1
+  - Egg: 5
+  - Parsley: 1
+  - Rice: 1
+- title: Chicken pie
+  ingredients:
+  - Chicken pie: 1
+  - Potatoes: 1
+  - Milk: 1
+  - Butter: 1
+  - Chives: 1
+  - French beans: 1
+- title: Pasta & Meatballs
+  ingredients:
+  - Meatballs: 1
+  - Pasta: 1
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 1
+  - Red pepper: 1
+  - Tinned tomatoes (400g): 1
+  - Tomato puree: 1
+  - Courgette: 1
+  - Stock cube: 1
+- title: Chicken Kievs
+  ingredients:
+  - Chicken Kiev: 2
+  - Chips (frozen): 1
+  - Peas (frozen): 1
+  - Mayonnaise: 1
+- title: Toad in the hole
+  ingredients:
+  - Olive oil: 1
+  - Pork (sausage): 6
+  - Milk: 1
+  - Flour: 1
+  - Egg: 2
+  - Broccoli: 1
+  - Gravy: 1
+- title: Comfy Chicken
+  tags:
+  - leftovers
+  ingredients:
+  - Olive oil: 1
+  - Chicken (breasts): 1
+  - Carrots: 1
+  - Celery: 1
+  - Creme fraiche: 1
+  - Mixed herbs: 1
+  - Parmesan: 1
+  - Onion: 2
+- title: Beef stroganoff
+  ingredients:
+  - Beef (diced): 400
+  - Onion: 1
+  - Butter: 1
+  - Parsley: 1
+  - Mushrooms: 1
+  - Sour cream: 1
+  - Black pepper: 1
+  - Pasta: 1
+  - Green beans: 1
+- title: Pork wraps
+  ingredients:
+  - Wraps: 1
+  - Mayonnaise: 1
+  - Yoghurt: 1
+  - Tortilla chips: 1
+  - Cheese: 1
+  - Olive oil: 1
+  - Onion: 1
+  - Red pepper: 1
+  - Pork (mince): 1
+  - BBQ sauce: 1
+  - Cumin: 1
+  - Paprika: 1
+  - Passata: 1
+  - Black beans: 1
+  - Sweetcorn: 1
+  - Lettuce: 1
+  - Garlic: 1
+- title: Kitchari
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 2
+  - Turmeric: 1
+  - Cumin: 1
+  - Coriander (ground): 0.5
+  - Mustard seeds: 1
+  - Red lentils: 250
+  - Long-grain rice: 160
+  - Carrots: 2
+  - Stock: 1
+  - Spinach (frozen): 100
+  - Naan bread: 1
+  - Mango chutney: 1
+- title: Chicken curry
+  ingredients:
+  - Chicken (breasts): 1
+  - Olive oil: 1
+  - Onion: 1
+  - Curry sauce: 1
+  - Mushrooms: 1
+  - Peas (frozen): 1
+  - Rice: 1
+  - Naan bread: 1
+  - Mango chutney: 1
+- title: Cottage pie
+  tags:
+  - leftovers
+  ingredients:
+  - Olive oil: 1
+  - Potato: 600
+  - Milk: 1
+  - Butter: 1
+  - Cheese: 1
+  - Onion: 1
+  - Garlic: 1
+  - Beef (mince): 400
+  - Carrots: 1
+  - Peas (frozen): 1
+  - Stock cube: 1
+  - Mushrooms: 1
+  - Flour: 1
+  - Worcestershire sauce: 1
+  - Oregano: 1
+  - Rosemary: 1
+  - Thyme: 1
+- title: Tuna casserole
+  ingredients:
+  - Olive oil: 1
+  - Celery: 1
+  - Onion: 1
+  - Tuna: 2
+  - Mushroom soup: 1
+  - Cheese: 1
+  - Bread crumbs: 1
+  - Parsley: 1
+  - Peas (frozen): 1
+  - Pasta: 1
+  - Crispy onions: 1
+- title: Ratatouille
+  ingredients:
+  - Olive oil: 1
+  - Red onion: 2
+  - Garlic: 1
+  - Aubergine: 2
+  - Courgette: 3
+  - Peppers: 4
+  - Passata: 1
+  - Tinned tomatoes: 1
+  - Caster sugar: 1
+  - Dried herbs: 1
+  - Balsamic or red wine vinegar: 1
+  - Parsley (fresh): 1
+  - Crusty bread: 1
+- title: Dutch Sandwiches
+  ingredients:
+  - Part-baked baguette: 1
+  - Mayonnaise: 1
+  - Egg: 1
+  - Ham: 1
+  - Gouda: 1
+  - Lettuce: 1
+  - Tomato: 1
+  - Cucumber: 1
+  - Crisps (small bags): 1
+- title: Chicken pasta bake
+  ingredients:
+  - Chicken (breasts): 1
+  - Pasta: 1
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 1
+  - Red pepper: 1
+  - Tinned tomatoes: 1
+  - Mascarpone: 1
+  - Cheese: 1
+  - Basil: 1
+  - Oregano: 1
+- title: Sweet Potato Quesadilla
+  ingredients:
+  - Wraps: 1
+  - Sweet potatoes: 4
+  - Chorizo pack: 1
+  - Feta: 1
+  - Parsley: 1
+- title: Tortelloni
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 1
+  - Red pepper: 1
+  - Tomato: 4
+  - Tomato puree: 1
+  - Courgette: 1
+  - Tortelloni: 1
+- title: Pizza
+  tags:
+  - convenience
+  ingredients:
+  - Pizza: 2
+  - Tuna: 1
+  - Cheese: 1
+- title: Chicken Enchilladas
+  ingredients:
+  - Chicken (breasts): 1
+  - Red pepper: 2
+  - Olive oil: 1
+  - Mild chilli powder: 1
+  - Cumin: 1
+  - Paprika: 1
+  - Grated mozzerella: 1
+  - Tortilla wraps (8 pack): 1
+  - Cheddar: 1
+  - Coriander (fresh): 1
+  - Onion: 1
+  - Garlic: 1
+  - Passata: 1
+  - Chipotle chilli paste: 1
+  - Black beans: 1
+  - Lime juice: 1
+- title: Taco casserole
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Garlic: 1
+  - Beef (mince): 500
+  - Taco seasoning: 1
+  - Black beans: 1
+  - Tinned tomatoes: 1
+  - Corn tortillas: 6
+  - Cheddar: 1
+  - Tortilla chips: 1
+  - Lettuce: 1
+  - Cherry tomatoes: 1
+- title: Pasta bolognaise
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Peppers: 1
+  - Beef (mince): 400
+  - Tinned tomatoes: 1
+  - Tomate puree: 1
+  - Basil: 1
+  - Oregano: 1
+  - Pasta: 1
+- title: Sausage & Bean Casserole
+  ingredients:
+  - Olive oil: 1
+  - Onion: 1
+  - Celery: 1
+  - Red pepper: 1
+  - Beef (sausage): 1
+  - Tinned tomatoes: 1
+  - Black beans: 1
+  - Rice: 1
+  - Garlic: 1
+  - Paprika: 1
+  - Thyme: 1
+  - Cumin: 1
+- title: Spinach & Ricotta Lasagne
+  tags:
+  - leftovers
+  ingredients:
+  - Parmesan: 85
+  - Dried lasagne: 300
+  - Butter: 85
+  - Flour (plain): 85
+  - Milk: 1.5
+  - Nutmeg: 1
+  - Onion: 2
+  - Olive oil: 1
+  - Spinach (frozen): 700
+  - Ricotta: 250
+- title: Chicken & Chorizo Jambalaya
+  ingredients:
+  - Olive oil: 1
+  - Chicken (breasts): 2
+  - Onion: 1
+  - Garlic: 1
+  - Red pepper: 1
+  - Chorizo pack: 1
+  - Cajun seasoning: 1
+  - Rice: 1
+  - Tinned tomatoes: 1
+  - Stock cube: 1

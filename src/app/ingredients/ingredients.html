@@ -1,0 +1,79 @@
+<!-- Loading spinner shown while ingredients.yaml is being fetched -->
+@if (loading()) {
+  <div
+    class="d-flex justify-content-center py-5"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading ingredients…</span>
+    </div>
+  </div>
+}
+
+<!-- Error alert shown when the data fetch fails -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error:</strong> {{ error() }}
+  </div>
+}
+
+<!-- Ingredients grouped by supermarket section as an accordion -->
+@if (!loading() && !error()) {
+  <h1 class="mb-4">Ingredients</h1>
+
+  <div class="accordion" id="ingredientsAccordion">
+    @for (section of sections(); track section.name; let i = $index) {
+      <div class="accordion-item">
+
+        <!-- Section header (clickable to expand / collapse) -->
+        <h2 class="accordion-header">
+          <button
+            class="accordion-button"
+            [class.collapsed]="i !== 0"
+            type="button"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#section-' + i"
+            [attr.aria-expanded]="i === 0 ? 'true' : 'false'"
+            [attr.aria-controls]="'section-' + i"
+          >
+            <strong>{{ section.name }}</strong>
+            <span class="badge bg-secondary ms-2">
+              {{ section.items.length }}
+            </span>
+          </button>
+        </h2>
+
+        <!-- Ingredient table for this section -->
+        <div
+          [id]="'section-' + i"
+          class="accordion-collapse collapse"
+          [class.show]="i === 0"
+          [attr.data-bs-parent]="'#ingredientsAccordion'"
+        >
+          <div class="accordion-body p-0">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Ingredient</th>
+                  <th scope="col" class="text-end">Unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of section.items; track item.name) {
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td class="text-end text-muted">
+                      {{ item.unit ?? 'each' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+}

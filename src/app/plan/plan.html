@@ -1,0 +1,435 @@
+<!-- Loading spinner while data is being fetched -->
+@if (loading()) {
+  <div
+    class="d-flex justify-content-center py-5"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading data…</span>
+    </div>
+  </div>
+}
+
+<!-- Error alert -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error:</strong> {{ error() }}
+  </div>
+}
+
+@if (!loading() && !error()) {
+
+  <!-- ── Date range & generate ─────────────────────────────── -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h1 class="h3 card-title mb-3">Meal Plan</h1>
+      <div class="row g-3 align-items-end">
+
+        <div class="col-sm-auto">
+          <label for="planStart" class="form-label fw-semibold">
+            From
+          </label>
+          <input
+            type="date"
+            id="planStart"
+            class="form-control"
+            [value]="startDate()"
+            (change)="startDate.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="col-sm-auto">
+          <label for="planEnd" class="form-label fw-semibold">To</label>
+          <input
+            type="date"
+            id="planEnd"
+            class="form-control"
+            [value]="endDate()"
+            (change)="endDate.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="col-sm-auto">
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="generatePlan()"
+          >
+            Generate Plan
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Empty state ─────────────────────────────────────── -->
+  @if (planEntries().length === 0) {
+    <div class="text-center text-muted py-5">
+      <p class="fs-5">
+        Choose your date range and click
+        <strong>Generate Plan</strong> to get started.
+      </p>
+    </div>
+  }
+
+  <!--
+    ── Calendar grid ──────────────────────────────────────────
+    Two-column layout: date label (left) | meal card (right).
+    Each plan day is a row; leftover entries span two rows in
+    both columns.  Expanding a card grows the row automatically.
+  -->
+  @if (planEntries().length > 0) {
+    <!--
+      The grid container handles dragover (to allow drop events) and
+      dragleave (to clear the indicator when the cursor leaves the grid).
+      Individual rows handle dragover to track the exact drop slot.
+    -->
+    <div
+      class="calendar-grid"
+      (dragover)="$event.preventDefault()"
+      (dragleave)="onGridDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      @for (
+        entry of planEntries();
+        track entry.dates[0].getTime();
+        let i = $index
+      ) {
+        @let row = entryRowStart()[i];
+        @let isLeftover = entry.dates.length > 1;
+        @let isNoOp = dragIndex() === i || dragIndex() === i - 1;
+        @let isLastNoOp =
+          dragIndex() === planEntries().length - 1;
+
+        <!-- Date label column (column 1) -->
+        <div
+          class="day-header"
+          [class.day-header--leftover]="isLeftover"
+          [style.grid-row]="
+            isLeftover ? (row + ' / span 2') : ('' + row)
+          "
+          (dragover)="onDragOver($event, i)"
+        >
+          @if (isLeftover) {
+            <span class="day-name">{{ dayName(entry.dates[0]) }}</span>
+            <span class="day-date">{{ shortDate(entry.dates[0]) }}</span>
+            <hr class="day-divider" aria-hidden="true" />
+            <span class="day-name">{{ dayName(entry.dates[1]) }}</span>
+            <span class="day-date">{{ shortDate(entry.dates[1]) }}</span>
+          } @else {
+            <span class="day-name">{{ dayName(entry.dates[0]) }}</span>
+            <span class="day-date">{{ shortDate(entry.dates[0]) }}</span>
+          }
+        </div>
+
+        <!--
+          Meal card column (column 2).
+          [class.drop-before]  – show blue insertion line above the card
+            when the cursor is targeting this slot, but only when doing
+            so would actually move the entry (not a no-op).
+          [class.drop-after]   – same for the last card (drop at end).
+          [class.is-dragging]  – fades the card being dragged.
+        -->
+        <div
+          class="card shadow-sm meal-card"
+          [class.border-info]="isLeftover"
+          [class.meal-changed]="changedIndex() === i"
+          [class.is-dragging]="dragIndex() === i"
+          [class.drop-before]="
+            dragIndex() !== null &&
+            dropSlot() === i &&
+            !isNoOp
+          "
+          [class.drop-after]="
+            dragIndex() !== null &&
+            dropSlot() === planEntries().length &&
+            i === planEntries().length - 1 &&
+            !isLastNoOp
+          "
+          [style.grid-row]="
+            isLeftover ? (row + ' / span 2') : ('' + row)
+          "
+          [style.border-left-width]="isLeftover ? '4px' : null"
+          (dragover)="onDragOver($event, i)"
+        >
+          <!-- Card header: click to expand/collapse -->
+          <div
+            class="card-header d-flex align-items-center gap-2
+                   flex-wrap user-select-none"
+            style="cursor: pointer;"
+            role="button"
+            [attr.aria-expanded]="entry.expanded"
+            (click)="toggleExpanded(i)"
+            (keydown.enter)="toggleExpanded(i)"
+            (keydown.space)="
+              $event.preventDefault(); toggleExpanded(i)
+            "
+            tabindex="0"
+          >
+            <!--
+              Drag handle: clicking here should not toggle the card,
+              only dragging from here should move the entry.
+              stopPropagation prevents the parent's (click) from firing.
+            -->
+            <div
+              class="drag-handle"
+              draggable="true"
+              (dragstart)="onDragStart($event, i)"
+              (dragend)="onDragEnd()"
+              (click)="$event.stopPropagation()"
+              title="Drag to reorder"
+              aria-label="Drag to reorder this meal"
+              role="button"
+            >&#x283F;</div>
+            <span class="fw-semibold flex-grow-1">
+              {{ entry.meal.title }}
+            </span>
+
+            <!-- Leftovers badge -->
+            @if (isLeftover) {
+              <span class="badge bg-info text-dark">leftovers</span>
+            }
+
+            <!-- Non-leftovers classification tags -->
+            @for (tag of (entry.meal.tags ?? []); track tag) {
+              @if (tag !== 'leftovers') {
+                <span class="badge bg-secondary">{{ tag }}</span>
+              }
+            }
+
+            <!-- Expand/collapse chevron -->
+            <span class="ms-auto text-muted" aria-hidden="true">
+              {{ entry.expanded ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <!-- Ingredient list (shown when expanded) -->
+          @if (entry.expanded) {
+            <div class="card-body pt-2 pb-0">
+              <ul class="list-group list-group-flush">
+                @for (
+                  ing of entry.meal.ingredients;
+                  track ing.name
+                ) {
+                  <li
+                    class="list-group-item px-0 py-1 d-flex
+                           justify-content-between
+                           align-items-center"
+                  >
+                    <span>{{ ing.name }}</span>
+                    <span class="badge bg-light text-dark border">
+                      {{ ing.quantity }}
+                      @if (unitFor(ing.name)) {
+                        {{ unitFor(ing.name) }}
+                      }
+                    </span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- Card footer: replacement controls -->
+          <div
+            class="card-footer d-flex align-items-center
+                   gap-2 flex-wrap"
+          >
+            <!--
+              Replacement-mode toggle — only for two-day entries.
+              Checked   = swap with another leftovers meal (keeps 2 days)
+              Unchecked = split into two single-day meals
+            -->
+            @if (isLeftover) {
+              <div class="form-check mb-0 me-2 flex-shrink-0">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [id]="'replMode-' + i"
+                  [checked]="entry.replaceWithLeftover"
+                  (change)="
+                    setReplaceMode(
+                      i,
+                      $any($event.target).checked
+                    )
+                  "
+                />
+                <label
+                  class="form-check-label small"
+                  [for]="'replMode-' + i"
+                >
+                  Replace with leftovers
+                </label>
+              </div>
+            }
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              title="Replace with a random meal"
+              (click)="replaceRandom(i)"
+            >
+              🎲 Random
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              title="Pick a replacement meal from the list"
+              (click)="openPicker(i)"
+            >
+              📋 Pick meal
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+}
+
+<!-- ── Picker modal overlay ────────────────────────────────────── -->
+@if (pickerOpen()) {
+  <!--
+    Semi-transparent backdrop. Clicking outside the dialog closes it.
+    The inner dialog stops click-event propagation so internal clicks
+    do not bubble up to this listener.
+  -->
+  <div
+    class="modal d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pickerTitle"
+    style="background: rgba(0, 0, 0, 0.5);"
+    (click)="closePicker()"
+    (keydown.escape)="closePicker()"
+  >
+    <div
+      class="modal-dialog modal-lg modal-dialog-scrollable"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="pickerTitle">
+            Choose a replacement meal
+          </h2>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close picker"
+            (click)="closePicker()"
+          ></button>
+        </div>
+
+        <!--
+          Replacement-mode checkbox — only visible when the entry being
+          replaced is a two-day (leftovers) entry.
+          Checked  = must pick another leftovers meal (2-day stay).
+          Unchecked = must pick a single meal (entry splits; day 2
+                      gets a random single meal automatically).
+        -->
+        @if (isPickerForLeftovers()) {
+          <div class="modal-body border-bottom py-3">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="pickerLeftoverCheck"
+                [checked]="pickerLeftover()"
+                (change)="
+                  pickerLeftover.set($any($event.target).checked)
+                "
+              />
+              <label
+                class="form-check-label"
+                for="pickerLeftoverCheck"
+              >
+                Replace with a leftovers meal
+                <span class="text-muted small d-block mt-1">
+                  Uncheck to split into two single-day meals. You
+                  pick day 1; a random meal is chosen for day 2.
+                </span>
+              </label>
+            </div>
+          </div>
+        }
+
+        <!-- Meal grid -->
+        <div class="modal-body">
+          <div
+            class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2"
+          >
+            @for (meal of allMeals(); track meal.title) {
+              <div class="col">
+                <!--
+                  Button states:
+                  • Selectable, not in plan  → green outline
+                  • Selectable, in plan      → secondary outline
+                                               + 50% opacity (grey)
+                  • Not selectable           → light bg + muted text
+                                               + disabled
+
+                  "In plan" meals are still clickable so the user can
+                  intentionally repeat a meal; they are merely greyed
+                  to make their current use visible.
+                -->
+                <button
+                  type="button"
+                  class="btn w-100 text-start py-2"
+                  [class.btn-outline-success]="
+                    isPickerSelectable(meal) &&
+                    !pickerMealsInPlan().has(meal.title)
+                  "
+                  [class.btn-outline-secondary]="
+                    isPickerSelectable(meal) &&
+                    pickerMealsInPlan().has(meal.title)
+                  "
+                  [class.btn-light]="!isPickerSelectable(meal)"
+                  [class.text-muted]="!isPickerSelectable(meal)"
+                  [class.opacity-50]="
+                    pickerMealsInPlan().has(meal.title)
+                  "
+                  [disabled]="!isPickerSelectable(meal)"
+                  (click)="confirmPick(meal)"
+                >
+                  <span class="d-block">{{ meal.title }}</span>
+                  <span class="d-flex gap-1 flex-wrap mt-1">
+                    @if (meal.tags?.includes('leftovers')) {
+                      <span class="badge bg-info text-dark">
+                        leftovers
+                      </span>
+                    }
+                    @if (meal.tags?.includes('convenience')) {
+                      <span class="badge bg-warning text-dark">
+                        convenience
+                      </span>
+                    }
+                    @if (pickerMealsInPlan().has(meal.title)) {
+                      <span class="badge bg-secondary">
+                        in plan
+                      </span>
+                    }
+                  </span>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closePicker()"
+          >
+            Cancel
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

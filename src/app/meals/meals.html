@@ -1,0 +1,97 @@
+<!-- Loading spinner shown while meals.yaml is being fetched -->
+@if (loading()) {
+  <div class="d-flex justify-content-center py-5" aria-live="polite" aria-busy="true">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading meals…</span>
+    </div>
+  </div>
+}
+
+<!-- Error alert shown when the data fetch fails -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error:</strong> {{ error() }}
+  </div>
+}
+
+<!-- Meal cards grid: responsive 1→2→3 columns -->
+@if (!loading() && !error()) {
+  <div class="d-flex align-items-center justify-content-between
+              flex-wrap gap-3 mb-4">
+    <h1 class="mb-0">Meals</h1>
+
+    <!-- Search bar: filters cards by meal name on every keystroke -->
+    <div class="input-group" style="max-width: 22rem;">
+      <span class="input-group-text" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+             fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001
+                   c.03.04.062.078.098.115l3.85 3.85a1 1 0 0
+                   0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0
+                   0-.115-.099zm-5.242 1.156a5.5 5.5 0 1 1
+                   0-11 5.5 5.5 0 0 1 0 11z"/>
+        </svg>
+      </span>
+      <input
+        type="search"
+        class="form-control"
+        placeholder="Search meals…"
+        aria-label="Search meals"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+      />
+    </div>
+  </div>
+
+  <!-- Result count hint shown when a query is active -->
+  @if (searchQuery().trim()) {
+    <p class="text-muted small mb-3">
+      {{ filteredMeals().length }}
+      {{ filteredMeals().length === 1 ? 'result' : 'results' }}
+      for &ldquo;{{ searchQuery().trim() }}&rdquo;
+    </p>
+  }
+
+  <!-- No-results message -->
+  @if (filteredMeals().length === 0) {
+    <div class="alert alert-info" role="status">
+      No meals match &ldquo;{{ searchQuery().trim() }}&rdquo;.
+    </div>
+  }
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    @for (meal of filteredMeals(); track meal.title) {
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+
+          <!-- Card header: title + tags -->
+          <div class="card-header d-flex align-items-center gap-2 flex-wrap">
+            <span class="fw-semibold flex-grow-1">{{ meal.title }}</span>
+            @for (tag of meal.tags ?? []; track tag) {
+              <span class="badge {{ tagClass(tag) }}">{{ tag }}</span>
+            }
+          </div>
+
+          <!-- Card body: ingredient list -->
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              @for (ingredient of meal.ingredients; track ingredient.name) {
+                <li class="list-group-item px-0 py-1 d-flex
+                           justify-content-between align-items-center">
+                  <span>{{ ingredient.name }}</span>
+                  <span class="badge bg-light text-dark border">
+                    {{ ingredient.quantity }}
+                    @if (unitFor(ingredient.name)) {
+                      {{ unitFor(ingredient.name) }}
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    }
+  </div>
+}
