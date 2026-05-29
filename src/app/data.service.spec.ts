@@ -44,6 +44,11 @@ describe('DataService', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
+    // Clear any localStorage data written by previous tests so that the
+    // caching fallback does not cause parse-error tests to receive stale
+    // cached data instead of propagating the expected error.
+    localStorage.clear();
+
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });

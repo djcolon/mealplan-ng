@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   OnInit,
   signal,
@@ -9,6 +10,7 @@ import {
 import { forkJoin } from 'rxjs';
 
 import { DataService } from '../data.service';
+import { PlanStorageService } from '../plan-storage.service';
 import { IngredientDefinition, Meal, PlanEntry } from '../models';
 
 // ── Date utilities ────────────────────────────────────────────────────────
@@ -250,6 +252,44 @@ function shortDay(d: Date): string {
 })
 export class PlanComponent implements OnInit {
   private readonly dataService = inject(DataService);
+  private readonly planStorage = inject(PlanStorageService);
+
+  /**
+   * Restores a previously saved plan from localStorage (synchronously,
+   * before any network activity) so the user sees their plan
+   * immediately on re-opening the app.
+   *
+   * Sets up a reactive `effect()` that auto-saves the plan to
+   * localStorage whenever `planEntries`, `startDate`, or `endDate`
+   * changes.  When the plan is empty the saved entry is removed so a
+   * future visit starts fresh.
+   */
+  constructor() {
+    // Restore persisted plan before the first render
+    const saved = this.planStorage.load();
+    if (saved) {
+      this.planEntries.set(saved.entries);
+      this.startDate.set(saved.startDate);
+      this.endDate.set(saved.endDate);
+    }
+
+    // Auto-persist whenever any part of the plan state changes.
+    // Angular schedules effects after change detection, so by the time
+    // this first runs the signals already hold the restored values.
+    effect(() => {
+      const entries = this.planEntries();
+      const start = this.startDate();
+      const end = this.endDate();
+
+      if (entries.length > 0) {
+        this.planStorage.save(entries, start, end);
+      } else {
+        // Plan was cleared — remove the stored entry so the next
+        // visit starts with an empty plan rather than a stale one.
+        this.planStorage.clear();
+      }
+    });
+  }
 
   // ── Data ──────────────────────────────────────────────────────────────
 
@@ -604,8 +644,16 @@ export class PlanComponent implements OnInit {
     this.extendIfLastIsLeftover();
   }
 
-  /** Clears all plan entries without changing the date pickers. */
+  /** Clears all plan entries without changing the date pickers.
+   *
+   * Also removes the persisted plan from localStorage so that
+   * a page reload starts with an empty plan.
+   */
   clearPlan(): void {
+    // The effect() will call planStorage.clear() when it observes the
+    // empty array, but we call it here too so the storage is cleared
+    // synchronously before any potential navigation away from the page.
+    this.planStorage.clear();
     this.planEntries.set([]);
   }
 
