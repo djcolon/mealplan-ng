@@ -1,0 +1,115 @@
+<!-- Loading spinner while ingredient definitions are being fetched -->
+@if (loading()) {
+  <div
+    class="d-flex justify-content-center py-5"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading data…</span>
+    </div>
+  </div>
+}
+
+<!-- Error alert -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error:</strong> {{ error() }}
+  </div>
+}
+
+@if (!loading() && !error()) {
+
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body">
+      <h1 class="h3 card-title mb-0">Shopping List</h1>
+    </div>
+  </div>
+
+  <!-- ── Empty state: no plan ──────────────────────────────── -->
+  @if (planEntries().length === 0) {
+    <div class="text-center text-muted py-5">
+      <p class="fs-5 mb-3">
+        No meal plan yet — generate one first.
+      </p>
+      <a routerLink="/plan" class="btn btn-success">
+        Go to Plan
+      </a>
+    </div>
+
+  <!-- ── Plan exists but has no ingredients ────────────────── -->
+  } @else if (shoppingGroups().length === 0) {
+    <p class="text-muted text-center py-4">
+      The current plan has no ingredients to list.
+    </p>
+
+  <!-- ── Shopping list grouped by supermarket section ─────── -->
+  } @else {
+    <!--
+      One Bootstrap card per supermarket section.
+      Items are sorted alphabetically within each section.
+      Both sections and items within them are sorted alphabetically.
+    -->
+    @for (group of shoppingGroups(); track group.section) {
+      <div class="card shadow-sm mb-3">
+
+        <!-- Section name as card header -->
+        <div class="card-header fw-semibold">
+          {{ group.section }}
+        </div>
+
+        <ul class="list-group list-group-flush" role="list">
+          @for (item of group.items; track item.name) {
+            <li class="list-group-item d-flex align-items-center gap-3">
+
+              <!--
+                Checkbox: checking/unchecking calls toggle() which
+                updates the `ticked` signal and triggers auto-save.
+              -->
+              <input
+                type="checkbox"
+                class="form-check-input flex-shrink-0 mt-0"
+                [id]="'shop-' + item.name"
+                [checked]="ticked().has(item.name)"
+                (change)="toggle(item.name)"
+              />
+
+              <!--
+                Label: occupies all remaining horizontal space.
+                Strikethrough + muted colour applied when ticked.
+              -->
+              <label
+                class="form-check-label flex-grow-1 mb-0"
+                [for]="'shop-' + item.name"
+                [class.text-decoration-line-through]="
+                  ticked().has(item.name)
+                "
+                [class.text-muted]="ticked().has(item.name)"
+              >
+                {{ item.name }}
+                <!--
+                  Latest use-by hint: rendered as a small de-emphasised
+                  badge so it does not compete with the ingredient name
+                  but is immediately visible to the shopper.
+                -->
+                <span class="badge text-bg-light fw-normal ms-1">
+                  use by {{ formatLatestDate(item.latestDate) }}
+                </span>
+              </label>
+
+              <!-- Quantity + unit, right-aligned and de-emphasised -->
+              @if (formatQuantity(item)) {
+                <span class="text-muted small text-nowrap">
+                  {{ formatQuantity(item) }}
+                </span>
+              }
+
+            </li>
+          }
+        </ul>
+
+      </div>
+    }
+  }
+
+}

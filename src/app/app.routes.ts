@@ -27,4 +27,12 @@ export const routes: Routes = [
       ),
     title: 'Ingredients – Meal Planner',
   },
+  {
+    path: 'shopping-list',
+    loadComponent: () =>
+      import('./shopping-list/shopping-list').then(
+        (m) => m.ShoppingListComponent,
+      ),
+    title: 'Shopping List – Meal Planner',
+  },
 ];

@@ -6,6 +6,13 @@ import { PlanEntry } from './models';
 const PLAN_KEY = 'mealplan-plan';
 
 /**
+ * localStorage key for the shopping-cart tick state.
+ * Exported so that ShoppingListComponent can read it and
+ * PlanStorageService.clear() can erase it together with the plan.
+ */
+export const CART_STORAGE_KEY = 'mealplan-cart';
+
+/**
  * Shape of the data written to localStorage.
  *
  * `Date` objects are not JSON-serialisable, so `dates` is stored as an
@@ -93,10 +100,15 @@ export class PlanStorageService {
     }
   }
 
-  /** Removes the saved plan from localStorage. */
+  /**
+   * Removes the saved plan and the shopping-cart tick state from
+   * localStorage.  Both are cleared together so that a fresh plan
+   * always starts with an empty cart.
+   */
   clear(): void {
     try {
       localStorage.removeItem(PLAN_KEY);
+      localStorage.removeItem(CART_STORAGE_KEY);
     } catch {
       // Ignore — nothing meaningful to do if removal fails
     }
