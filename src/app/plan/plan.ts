@@ -91,23 +91,30 @@ function shortDay(d: Date): string {
     `
       /* ── Calendar grid ──────────────────────────────────── */
       /*
-       * Two-column grid: fixed-width date-label column on the left,
-       * flexible card column on the right.  Each day is a row; the
-       * grid auto-sizes rows to fit content so expanded cards grow
-       * naturally and pull leftover entries with them.
+       * Flex-column list of plan rows.  Each row is a flex row
+       * with the date label fixed-width on the left and the meal
+       * card filling the rest on the right.
+       * Using a flex row (not CSS Grid) guarantees the day-header
+       * always stretches to match the card height via
+       * align-items: stretch, even for leftover entries.
        */
-      .calendar-grid {
-        display: grid;
-        grid-template-columns: 5rem 1fr;
-        grid-auto-rows: auto;
-        row-gap: 0.75rem;
-        column-gap: 0.75rem;
-        align-items: stretch;
+      .plan-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
       }
 
-      /* Date label in the left column (both single and leftover days) */
+      .plan-row {
+        display: flex;
+        align-items: stretch;
+        gap: 0.75rem;
+        /* anchor the ::before / ::after drop-indicator lines */
+        position: relative;
+      }
+
+      /* Date label \u2014 fixed width, fills full row height via flex */
       .day-header {
-        grid-column: 1;
+        flex: 0 0 5rem;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -135,11 +142,11 @@ function shortDay(d: Date): string {
       }
 
       /*
-       * For leftover entries the date label spans 2 rows.
-       * Show both days separated by a thin horizontal rule.
+       * Leftover date label covers both days.
+       * space-evenly distributes the two day-blocks across the
+       * full height of the taller meal card.
        */
       .day-header--leftover {
-        flex-direction: column;
         justify-content: space-evenly;
       }
       .day-header--leftover .day-divider {
@@ -149,13 +156,22 @@ function shortDay(d: Date): string {
         margin: 0.25rem 0;
       }
 
-      /* Meal cards always sit in the right column. */
+      /* Meal cards fill the remaining row width */
       .meal-card {
-        grid-column: 2;
+        flex: 1 1 auto;
         min-width: 0;
-        /* Needed so ::before / ::after drop-indicator lines are
-           positioned relative to the card, not the page. */
-        position: relative;
+      }
+
+      /*
+       * For leftover cards the card is taller than its collapsed
+       * content (header + footer).  Bootstrap's .card is a flex
+       * column, so the extra height appears as dead space below the
+       * card-header.  Setting flex: 1 on the card-header makes it
+       * grow to absorb that space, which in turn pushes the
+       * card-footer to the bottom of the card.
+       */
+      .meal-card .card-header {
+        flex: 1 1 auto;
       }
 
       /* ── Drag handle ─────────────────────────────────────── */
@@ -174,22 +190,19 @@ function shortDay(d: Date): string {
       .drag-handle:hover  { color: #6c757d; }
       .drag-handle:active { cursor: grabbing; }
 
-      /* Dragged card fades in place so the user can see the gap. */
-      .is-dragging { opacity: 0.25; }
+      /* Dragged row fades so the gap it leaves is visible. */
+      .plan-row.is-dragging { opacity: 0.25; }
 
       /* ── Drop indicator line ─────────────────────────────── */
       /*
-       * A 3 px blue line rendered via ::before (before a card) or
-       * ::after (after the last card).  The negative left value
-       * extends the line over the day-header column so it spans
-       * the full grid width.
+       * A 3 px blue line rendered via ::before (before a row) or
+       * ::after (after the last row).  Spans the full row width.
        */
-      .drop-before::before,
-      .drop-after::after {
+      .plan-row.drop-before::before,
+      .plan-row.drop-after::after {
         content: '';
         position: absolute;
-        /* span left over: day-header (5rem) + column-gap (0.75rem) */
-        left: calc(-5rem - 0.75rem);
+        left: 0;
         right: 0;
         height: 3px;
         background: #0d6efd;
@@ -198,8 +211,8 @@ function shortDay(d: Date): string {
         pointer-events: none;
       }
       /* Centre the line in the 0.75rem row-gap (half = 0.375rem) */
-      .drop-before::before { top:    calc(-0.375rem - 1.5px); }
-      .drop-after::after   { bottom: calc(-0.375rem - 1.5px); }
+      .plan-row.drop-before::before { top:    calc(-0.375rem - 1.5px); }
+      .plan-row.drop-after::after   { bottom: calc(-0.375rem - 1.5px); }
 
       /* ── Flash animation ─────────────────────────────────── */
       @keyframes meal-flash {
@@ -218,6 +231,19 @@ function shortDay(d: Date): string {
       }
       .meal-changed {
         animation: meal-flash 0.8s ease-out;
+      }
+
+      /* ── Picker card tag accents ─────────────────────────── */
+      /*
+       * A 4 px inset box-shadow on the left edge acts as a colour-
+       * coded tag indicator without disrupting the button's own
+       * border or layout.
+       */
+      .picker-btn.picker-tag-leftovers {
+        box-shadow: inset 4px 0 0 0 #0dcaf0;
+      }
+      .picker-btn.picker-tag-convenience {
+        box-shadow: inset 4px 0 0 0 #ffc107;
       }
     `,
   ],
@@ -334,6 +360,26 @@ export class PlanComponent implements OnInit {
    * each time the picker opens.
    */
   readonly pickerLeftover = signal(true);
+
+  /** Free-text search query for filtering the picker meal list. */
+  readonly pickerSearch = signal('');
+
+  /**
+   * Alphabetically sorted list of all meals, filtered by the
+   * current `pickerSearch` query (case-insensitive partial match
+   * on the meal title).
+   *
+   * Selectable / non-selectable logic is handled separately in the
+   * template via `isPickerSelectable()`, so all meals are shown here
+   * but disabled ones remain visible (greyed out) so the user can
+   * see the full catalogue.
+   */
+  readonly pickerFilteredMeals = computed(() => {
+    const q = this.pickerSearch().trim().toLowerCase();
+    return [...this.allMeals()]
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .filter((m) => !q || m.title.toLowerCase().includes(q));
+  });
 
   /**
    * Set of meal titles already in the plan, excluding the entry
@@ -554,6 +600,110 @@ export class PlanComponent implements OnInit {
     }
 
     this.planEntries.set(this.buildPlan(this.allMeals(), dates));
+    // If the last picked meal needs a "leftover day", extend the plan.
+    this.extendIfLastIsLeftover();
+  }
+
+  /** Clears all plan entries without changing the date pickers. */
+  clearPlan(): void {
+    this.planEntries.set([]);
+  }
+
+  /**
+   * Prepends one new day before the first entry in the plan.
+   *
+   * A single random meal is generated for that day, and the
+   * `startDate` picker is moved back by one day to stay in sync.
+   */
+  prependDay(): void {
+    const entries = this.planEntries();
+    if (entries.length === 0) return;
+
+    const firstDate = entries[0].dates[0];
+    const newDate = addDays(firstDate, -1);
+
+    // Pick a meal that isn't already used in the plan
+    const used = new Set(entries.map((e) => e.meal.title));
+    const pool = this.allMeals().filter((m) => !used.has(m.title));
+    const meal = this.pickRandom(pool.length ? pool : this.allMeals());
+
+    this.planEntries.update((es) => [
+      { meal, dates: [newDate], expanded: false, replaceWithLeftover: true },
+      ...es,
+    ]);
+
+    // Keep the date picker in sync
+    this.startDate.set(toInputDate(newDate));
+  }
+
+  /**
+   * Appends one new day after the last entry in the plan.
+   *
+   * A single random meal is generated for that day, and the
+   * `endDate` picker is moved forward by one day to stay in sync.
+   */
+  appendDay(): void {
+    const entries = this.planEntries();
+    if (entries.length === 0) return;
+
+    const lastEntry = entries[entries.length - 1];
+    const lastDate = lastEntry.dates[lastEntry.dates.length - 1];
+    const newDate = addDays(lastDate, 1);
+
+    // Pick a meal that isn't already used in the plan
+    const used = new Set(entries.map((e) => e.meal.title));
+    const pool = this.allMeals().filter((m) => !used.has(m.title));
+    const meal = this.pickRandom(pool.length ? pool : this.allMeals());
+
+    this.planEntries.update((es) => [
+      ...es,
+      { meal, dates: [newDate], expanded: false, replaceWithLeftover: true },
+    ]);
+
+    // Keep the date picker in sync
+    this.endDate.set(toInputDate(newDate));
+  }
+
+  /**
+   * Deletes the entry at index `i` from the plan.
+   *
+   * Entries that follow the deleted one are shifted backwards:
+   * each of their dates is moved earlier by the number of days
+   * the deleted entry occupied (1 for a single-day entry, 2 for
+   * a two-day leftovers entry).
+   *
+   * The end-date picker is also moved back by the same amount so
+   * it stays in sync with the shortened plan.
+   */
+  deleteEntry(i: number): void {
+    const entries = this.planEntries();
+    const removed = entries[i];
+    const shift = removed.dates.length; // days to pull subsequent entries back
+
+    const updated = entries
+      .filter((_, idx) => idx !== i)
+      .map((entry, idx) => {
+        // Only entries that were originally AFTER the deleted one move back
+        if (idx < i) return entry;
+        return {
+          ...entry,
+          dates: entry.dates.map((d) => addDays(d, -shift)),
+        };
+      });
+
+    this.planEntries.set(updated);
+
+    // Shrink the end-date picker to match the new last date
+    if (updated.length > 0) {
+      const last = updated[updated.length - 1];
+      this.endDate.set(
+        toInputDate(last.dates[last.dates.length - 1]),
+      );
+    } else {
+      // Plan is now empty; pull the end date back by the deleted span
+      const currentEnd = fromInputDate(this.endDate());
+      this.endDate.set(toInputDate(addDays(currentEnd, -shift)));
+    }
   }
 
   /**
@@ -700,6 +850,10 @@ export class PlanComponent implements OnInit {
    * Replaces the meal in an entry in-place, keeping the same dates.
    * Picks from the leftovers pool for two-day entries, or from all
    * meals for single-day entries.
+   *
+   * When the chosen meal has the 'leftovers' tag and the entry is
+   * currently single-day, the entry expands to span two days and
+   * the last entry in the plan is removed to preserve the date range.
    */
   private swapMealInPlace(
     i: number,
@@ -714,11 +868,19 @@ export class PlanComponent implements OnInit {
     const pool = base.filter((m) => !used.has(m.title));
     const newMeal = this.pickRandom(pool.length ? pool : base);
 
+    // If a single-day entry gains a leftovers meal, expand it to 2 days
+    if (!isLeftoverEntry && newMeal.tags?.includes('leftovers')) {
+      this.expandToLeftover(i, newMeal);
+      return;
+    }
+
     this.planEntries.update((es) => {
       const copy = [...es];
       copy[i] = { ...entry, meal: newMeal };
       return copy;
     });
+    // Extend the plan if a leftovers meal ends up on the last day.
+    this.extendIfLastIsLeftover();
   }
 
   // ── Picker ────────────────────────────────────────────────────────────
@@ -728,6 +890,8 @@ export class PlanComponent implements OnInit {
     const entry = this.planEntries()[i];
     this.pickerEntryIndex.set(i);
     this.pickerLeftover.set(entry.replaceWithLeftover);
+    // Always start with an empty search so all meals are visible
+    this.pickerSearch.set('');
   }
 
   /** Closes the picker without making any selection. */
@@ -802,13 +966,22 @@ export class PlanComponent implements OnInit {
         );
         return copy;
       });
+    } else if (
+      !this.isPickerForLeftovers() &&
+      (meal.tags?.includes('leftovers') ?? false)
+    ) {
+      // Single-day entry → leftovers meal: expand to 2 days, drop the
+      // last entry to keep the total date range unchanged.
+      this.expandToLeftover(i, meal);
     } else {
-      // Simple in-place swap
+      // Simple in-place swap (same span)
       this.planEntries.update((es) => {
         const copy = [...es];
         copy[i] = { ...entry, meal };
         return copy;
       });
+      // Extend the plan if a leftovers meal ends up on the last day.
+      this.extendIfLastIsLeftover();
     }
 
     // Flash the updated card before closing the picker
@@ -818,9 +991,126 @@ export class PlanComponent implements OnInit {
 
   // ── Utilities ─────────────────────────────────────────────────────────
 
+  /**
+   * Returns a CSS class name for the left-border tag accent applied
+   * to picker cards.  Leftovers takes priority when a meal has both
+   * tags, since it has the greater structural impact on the plan.
+   *
+   * Returns an empty string when the meal has no recognised tags.
+   */
+  pickerTagClass(meal: Meal): string {
+    const tags = meal.tags ?? [];
+    if (tags.includes('leftovers')) return 'picker-tag-leftovers';
+    if (tags.includes('convenience')) return 'picker-tag-convenience';
+    return '';
+  }
+
   /** Returns a uniformly random element from `arr`. */
   private pickRandom<T>(arr: T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  /**
+   * Expands the single-day entry at index `i` into a two-day leftover
+   * entry, redistributing all subsequent entries onto the dates that
+   * follow.  Because the expanded entry consumes one extra date slot,
+   * the last entry in the plan is dropped to keep the total date range
+   * the same.
+   *
+   * If the entry sits on the very last date (no room to span two days)
+   * the meal is assigned as a single-day entry instead.
+   */
+  private expandToLeftover(i: number, newMeal: Meal): void {
+    const entries = this.planEntries();
+    // Flat ordered list of every date currently in the plan
+    const allDates = entries.flatMap((e) => e.dates);
+
+    // Where does entry i start in the flat date array?
+    const dateOffset = entries
+      .slice(0, i)
+      .reduce((sum, e) => sum + e.dates.length, 0);
+
+    if (dateOffset + 1 >= allDates.length) {
+      // Entry is on the last available date: assign the meal in-place.
+      // extendIfLastIsLeftover() below will add the second date needed.
+      this.planEntries.update((es) => {
+        const copy = [...es];
+        copy[i] = { ...entries[i], meal: newMeal, replaceWithLeftover: true };
+        return copy;
+      });
+    } else {
+      // Walk through entries in order, reassigning dates sequentially.
+      // Entry i gets 2 dates; all subsequent entries keep their original
+      // span but their starting date shifts by 1.  Any entry that runs
+      // out of dates is silently dropped.  If the new last entry is a
+      // leftovers meal, extendIfLastIsLeftover() below adds the extra day.
+      const result: PlanEntry[] = [];
+      let cursor = 0;
+
+      for (let j = 0; j < entries.length; j++) {
+        if (j === i) {
+          result.push({
+            ...entries[j],
+            meal: newMeal,
+            dates: allDates.slice(cursor, cursor + 2),
+            replaceWithLeftover: true,
+          });
+          cursor += 2;
+        } else {
+          const span = entries[j].dates.length;
+          const newDates = allDates.slice(cursor, cursor + span);
+          // No dates left — this entry (and any after it) is dropped
+          if (newDates.length === 0) break;
+          result.push({ ...entries[j], dates: newDates });
+          cursor += newDates.length;
+        }
+      }
+
+      this.planEntries.set(result);
+    }
+
+    // Extend the plan if the new last entry is a leftovers meal covering
+    // only one day (either because it was always last, or because date
+    // redistribution shifted a leftovers meal to the last slot).
+    this.extendIfLastIsLeftover();
+  }
+
+  /**
+   * Checks whether the last plan entry is a leftovers meal that only
+   * covers a single day.  If it is, the entry is extended to two days
+   * by appending the next calendar date, and the end-date picker is
+   * advanced accordingly.
+   *
+   * Called after any operation that could place a leftovers meal at the
+   * end of the plan: generation, random replacement, picker selection,
+   * or an expandToLeftover cascade.
+   */
+  private extendIfLastIsLeftover(): void {
+    const entries = this.planEntries();
+    if (entries.length === 0) return;
+
+    const last = entries[entries.length - 1];
+    const isLeftovers = last.meal.tags?.includes('leftovers') ?? false;
+
+    // Already spans two days, or is not a leftovers meal — nothing to do
+    if (!isLeftovers || last.dates.length >= 2) return;
+
+    // Add the calendar day immediately following the current last date
+    const extraDate = addDays(last.dates[last.dates.length - 1], 1);
+
+    this.planEntries.update((es) => {
+      const copy = [...es];
+      const lastEntry = copy[copy.length - 1];
+      copy[copy.length - 1] = {
+        ...lastEntry,
+        dates: [...lastEntry.dates, extraDate],
+        replaceWithLeftover: true,
+      };
+      return copy;
+    });
+
+    // Keep the end-date picker in sync with the extended date range
+    this.endDate.set(toInputDate(extraDate));
   }
 
   /**

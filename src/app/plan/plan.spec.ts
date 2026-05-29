@@ -189,14 +189,18 @@ describe('PlanComponent', () => {
     );
 
     it(
-      'gives a leftovers entry only 1 date on the last day of the range',
+      'extends a leftovers entry on the last day to 2 dates',
       () => {
+        // The requested range is a single day but the only available meal
+        // is tagged leftovers.  extendIfLastIsLeftover adds a second
+        // "leftover day" and advances the end-date picker.
         const { component } = setup([leftoverMeal]);
         component.allMeals.set([leftoverMeal]);
         component.startDate.set('2026-06-01');
         component.endDate.set('2026-06-01');
         component.generatePlan();
-        expect(component.planEntries()[0].dates).toHaveLength(1);
+        expect(component.planEntries()[0].dates).toHaveLength(2);
+        expect(component.endDate()).toBe('2026-06-02');
       },
     );
 
@@ -211,15 +215,19 @@ describe('PlanComponent', () => {
       }
     });
 
-    it('covers exactly 7 days regardless of leftover spans', () => {
-      // Mix of single and leftovers so spans vary
-      const { component } = setup();
-      component.allMeals.set(ALL_MEALS);
-      component.startDate.set('2026-06-01');
-      component.endDate.set('2026-06-07');
-      component.generatePlan();
-      expect(totalDays(component.planEntries())).toBe(7);
-    });
+    it(
+      'covers at least 7 days regardless of leftover spans',
+      () => {
+        // Mix of single and leftovers so spans vary.  If the last meal
+        // is a leftovers meal, extendIfLastIsLeftover adds 1 extra day.
+        const { component } = setup();
+        component.allMeals.set(ALL_MEALS);
+        component.startDate.set('2026-06-01');
+        component.endDate.set('2026-06-07');
+        component.generatePlan();
+        expect(totalDays(component.planEntries())).toBeGreaterThanOrEqual(7);
+      },
+    );
   });
 
   // ── toggleExpanded() ───────────────────────────────────────────────
@@ -379,6 +387,118 @@ describe('PlanComponent', () => {
       for (const e of component.planEntries()) {
         expect(e.meal.tags?.includes('leftovers') ?? false).toBe(false);
       }
+    });
+
+    it(
+      'extends the plan by 1 day when a leftovers meal ends up last',
+      () => {
+        // Only a leftovers meal is available, so replaceRandom must pick
+        // it.  The entry sits on the last date, so extendIfLastIsLeftover
+        // adds a second date and advances endDate by 1 day.
+        const { component } = setup([leftoverMeal]);
+        component.allMeals.set([leftoverMeal]);
+        const d = new Date('2026-06-05');
+        component.planEntries.set([makeEntry(mealA, [d])]);
+        component.endDate.set('2026-06-05');
+        component.replaceRandom(0);
+        expect(component.planEntries()[0].dates).toHaveLength(2);
+        expect(component.endDate()).toBe('2026-06-06');
+      },
+    );
+  });
+
+  // ── deleteEntry() ──────────────────────────────────────────────────
+
+  describe('deleteEntry()', () => {
+    it('removes the entry from the plan', () => {
+      const { component } = setup();
+      const d1 = new Date('2026-06-01');
+      const d2 = new Date('2026-06-02');
+      component.planEntries.set([
+        makeEntry(mealA, [d1]),
+        makeEntry(mealB, [d2]),
+      ]);
+      component.deleteEntry(0);
+      expect(component.planEntries()).toHaveLength(1);
+      expect(component.planEntries()[0].meal.title).toBe(mealB.title);
+    });
+
+    it('shifts subsequent dates back by 1 for a single-day entry', () => {
+      const { component } = setup();
+      const d1 = new Date('2026-06-01');
+      const d2 = new Date('2026-06-02');
+      const d3 = new Date('2026-06-03');
+      component.planEntries.set([
+        makeEntry(mealA, [d1]),
+        makeEntry(mealB, [d2]),
+        makeEntry(mealC, [d3]),
+      ]);
+      component.deleteEntry(0);
+      // B and C each shift back by 1 day
+      expect(component.planEntries()[0].dates[0]).toEqual(
+        new Date('2026-06-01'),
+      );
+      expect(component.planEntries()[1].dates[0]).toEqual(
+        new Date('2026-06-02'),
+      );
+    });
+
+    it('shifts subsequent dates back by 2 for a two-day entry', () => {
+      const { component } = setup();
+      const dates = makeDates(new Date('2026-06-01'), 2); // Mon + Tue
+      const d3 = new Date('2026-06-03');
+      component.planEntries.set([
+        makeEntry(leftoverMeal, dates),
+        makeEntry(mealA, [d3]),
+      ]);
+      component.deleteEntry(0);
+      expect(component.planEntries()).toHaveLength(1);
+      // mealA shifts back by 2 days: 06/03 → 06/01
+      expect(component.planEntries()[0].dates[0]).toEqual(
+        new Date('2026-06-01'),
+      );
+    });
+
+    it('does not shift entries before the deleted one', () => {
+      const { component } = setup();
+      const d1 = new Date('2026-06-01');
+      const d2 = new Date('2026-06-02');
+      const d3 = new Date('2026-06-03');
+      component.planEntries.set([
+        makeEntry(mealA, [d1]),
+        makeEntry(mealB, [d2]),
+        makeEntry(mealC, [d3]),
+      ]);
+      component.deleteEntry(1); // delete mealB
+      // mealA is before the deleted entry and must not move
+      expect(component.planEntries()[0].dates[0]).toEqual(d1);
+      // mealC shifts back by 1
+      expect(component.planEntries()[1].dates[0]).toEqual(
+        new Date('2026-06-02'),
+      );
+    });
+
+    it('updates endDate to the new last date', () => {
+      const { component } = setup();
+      component.planEntries.set([
+        makeEntry(mealA, [new Date('2026-06-01')]),
+        makeEntry(mealB, [new Date('2026-06-02')]),
+        makeEntry(mealC, [new Date('2026-06-03')]),
+      ]);
+      component.endDate.set('2026-06-03');
+      component.deleteEntry(2); // delete last entry
+      expect(component.endDate()).toBe('2026-06-02');
+    });
+
+    it('shrinks endDate when the only entry is deleted', () => {
+      const { component } = setup();
+      component.planEntries.set([
+        makeEntry(mealA, [new Date('2026-06-05')]),
+      ]);
+      component.endDate.set('2026-06-05');
+      component.deleteEntry(0);
+      expect(component.planEntries()).toHaveLength(0);
+      expect(component.endDate()).toBe('2026-06-04');
     });
   });
 
@@ -566,6 +686,56 @@ describe('PlanComponent', () => {
       component.confirmPick(mealB);
       expect(component.pickerOpen()).toBe(false);
     });
+
+    it(
+      'extends the plan by 1 day when a leftovers meal is picked last',
+      () => {
+        // Picking a leftovers meal for the last single-day entry calls
+        // expandToLeftover, whose fallback then calls
+        // extendIfLastIsLeftover to add the second date.
+        const { component } = setup([mealA, leftoverMeal]);
+        component.allMeals.set([mealA, leftoverMeal]);
+        const d = new Date('2026-06-07');
+        component.planEntries.set([makeEntry(mealA, [d])]);
+        component.endDate.set('2026-06-07');
+        component.pickerEntryIndex.set(0);
+        component.confirmPick(leftoverMeal);
+        expect(component.planEntries()[0].dates).toHaveLength(2);
+        expect(component.endDate()).toBe('2026-06-08');
+      },
+    );
+
+    it(
+      'extends by 1 day when expandToLeftover shifts leftovers to last',
+      () => {
+        // Plan: A[Mon], B[Tue], C[Wed], D_leftovers[Thu,Fri].
+        // Expanding A to a leftovers meal redistributes all dates:
+        // leftoverMeal[Mon,Tue], B[Wed], C[Thu], D_leftovers[Fri].
+        // D_leftovers ends up with only 1 date; extendIfLastIsLeftover
+        // must append Sat and advance endDate.
+        const { component } = setup([leftoverMeal, mealA, mealB, mealC]);
+        component.allMeals.set([leftoverMeal, mealA, mealB, mealC]);
+        component.planEntries.set([
+          makeEntry(mealA,        [new Date('2026-06-01')]),
+          makeEntry(mealB,        [new Date('2026-06-02')]),
+          makeEntry(mealC,        [new Date('2026-06-03')]),
+          makeEntry(
+            leftoverMeal2,
+            [new Date('2026-06-04'), new Date('2026-06-05')],
+            { replaceWithLeftover: true },
+          ),
+        ]);
+        component.endDate.set('2026-06-05');
+        component.pickerEntryIndex.set(0);
+        component.confirmPick(leftoverMeal);
+
+        const entries = component.planEntries();
+        expect(entries).toHaveLength(4);
+        // D_leftovers was compressed to 1 date; must now span 2 dates
+        expect(entries[3].dates).toHaveLength(2);
+        expect(component.endDate()).toBe('2026-06-06');
+      },
+    );
   });
 
   // ── formatEntryDates() ─────────────────────────────────────────────

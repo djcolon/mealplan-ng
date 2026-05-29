@@ -2,6 +2,9 @@
 
 A weekly meal-planning web application built with Angular 21.
 
+> This application was written using copilot with Claude Sonnet 4.6
+> as an experiment. There is very little hand-written code in this repo.
+
 The app lets you:
 
 - **Generate a meal plan** — pick a date range and the app randomly assigns

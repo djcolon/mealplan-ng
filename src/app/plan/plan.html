@@ -21,7 +21,7 @@
 @if (!loading() && !error()) {
 
   <!-- ── Date range & generate ─────────────────────────────── -->
-  <div class="card mb-4 shadow-sm">
+  <div class="card mb-3 shadow-sm">
     <div class="card-body">
       <h1 class="h3 card-title mb-3">Meal Plan</h1>
       <div class="row g-3 align-items-end">
@@ -58,6 +58,15 @@
           >
             Generate Plan
           </button>
+          @if (planEntries().length > 0) {
+            <button
+              type="button"
+              class="btn btn-danger ms-2"
+              (click)="clearPlan()"
+            >
+              Clear
+            </button>
+          }
         </div>
 
       </div>
@@ -82,60 +91,44 @@
   -->
   @if (planEntries().length > 0) {
     <!--
-      The grid container handles dragover (to allow drop events) and
-      dragleave (to clear the indicator when the cursor leaves the grid).
-      Individual rows handle dragover to track the exact drop slot.
+      Flex-column list.  Each plan entry is a .plan-row (flex row)
+      containing the date label on the left and the meal card on
+      the right.  The flex row's align-items: stretch guarantees
+      the day-header always fills the full height of the meal card,
+      including for leftover entries where the card is taller.
+      Drag/drop events are handled at the row level.
     -->
     <div
-      class="calendar-grid"
+      class="plan-list"
       (dragover)="$event.preventDefault()"
       (dragleave)="onGridDragLeave($event)"
       (drop)="onDrop($event)"
     >
+      <!-- + button before the first meal -->
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-success w-100"
+        title="Add a day before the plan"
+        (click)="prependDay()"
+      >+</button>
+
       @for (
         entry of planEntries();
         track entry.dates[0].getTime();
         let i = $index
       ) {
-        @let row = entryRowStart()[i];
         @let isLeftover = entry.dates.length > 1;
         @let isNoOp = dragIndex() === i || dragIndex() === i - 1;
         @let isLastNoOp =
           dragIndex() === planEntries().length - 1;
 
-        <!-- Date label column (column 1) -->
-        <div
-          class="day-header"
-          [class.day-header--leftover]="isLeftover"
-          [style.grid-row]="
-            isLeftover ? (row + ' / span 2') : ('' + row)
-          "
-          (dragover)="onDragOver($event, i)"
-        >
-          @if (isLeftover) {
-            <span class="day-name">{{ dayName(entry.dates[0]) }}</span>
-            <span class="day-date">{{ shortDate(entry.dates[0]) }}</span>
-            <hr class="day-divider" aria-hidden="true" />
-            <span class="day-name">{{ dayName(entry.dates[1]) }}</span>
-            <span class="day-date">{{ shortDate(entry.dates[1]) }}</span>
-          } @else {
-            <span class="day-name">{{ dayName(entry.dates[0]) }}</span>
-            <span class="day-date">{{ shortDate(entry.dates[0]) }}</span>
-          }
-        </div>
-
         <!--
-          Meal card column (column 2).
-          [class.drop-before]  – show blue insertion line above the card
-            when the cursor is targeting this slot, but only when doing
-            so would actually move the entry (not a no-op).
-          [class.drop-after]   – same for the last card (drop at end).
-          [class.is-dragging]  – fades the card being dragged.
+          Plan row: wraps [day-header | meal-card] for one entry.
+          is-dragging, drop-before/after all live here so the
+          indicator spans the full row width (date label + card).
         -->
         <div
-          class="card shadow-sm meal-card"
-          [class.border-info]="isLeftover"
-          [class.meal-changed]="changedIndex() === i"
+          class="plan-row"
           [class.is-dragging]="dragIndex() === i"
           [class.drop-before]="
             dragIndex() !== null &&
@@ -148,12 +141,33 @@
             i === planEntries().length - 1 &&
             !isLastNoOp
           "
-          [style.grid-row]="
-            isLeftover ? (row + ' / span 2') : ('' + row)
-          "
-          [style.border-left-width]="isLeftover ? '4px' : null"
           (dragover)="onDragOver($event, i)"
         >
+
+          <!-- Date label -->
+          <div
+            class="day-header"
+            [class.day-header--leftover]="isLeftover"
+          >
+            @if (isLeftover) {
+              <span class="day-name">{{ dayName(entry.dates[0]) }}</span>
+              <span class="day-date">{{ shortDate(entry.dates[0]) }}</span>
+              <hr class="day-divider" aria-hidden="true" />
+              <span class="day-name">{{ dayName(entry.dates[1]) }}</span>
+              <span class="day-date">{{ shortDate(entry.dates[1]) }}</span>
+            } @else {
+              <span class="day-name">{{ dayName(entry.dates[0]) }}</span>
+              <span class="day-date">{{ shortDate(entry.dates[0]) }}</span>
+            }
+          </div>
+
+          <!-- Meal card -->
+          <div
+            class="card shadow-sm meal-card"
+            [class.border-info]="isLeftover"
+            [class.meal-changed]="changedIndex() === i"
+            [style.border-left-width]="isLeftover ? '4px' : null"
+          >
           <!-- Card header: click to expand/collapse -->
           <div
             class="card-header d-flex align-items-center gap-2
@@ -232,17 +246,14 @@
           }
 
           <!-- Card footer: replacement controls -->
-          <div
-            class="card-footer d-flex align-items-center
-                   gap-2 flex-wrap"
-          >
+          <div class="card-footer">
             <!--
               Replacement-mode toggle — only for two-day entries.
               Checked   = swap with another leftovers meal (keeps 2 days)
               Unchecked = split into two single-day meals
             -->
             @if (isLeftover) {
-              <div class="form-check mb-0 me-2 flex-shrink-0">
+              <div class="form-check mb-2">
                 <input
                   type="checkbox"
                   class="form-check-input"
@@ -264,28 +275,78 @@
               </div>
             }
 
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-secondary"
-              title="Replace with a random meal"
-              (click)="replaceRandom(i)"
-            >
-              🎲 Random
-            </button>
+            <!--
+              On small screens: two-row layout.
+                Row 1 — Random + Pick meal, equal width (flex-fill).
+                Row 2 — Delete, full width (w-100 inside a block div).
+              On md+ screens: single flex row.
+                Random and Pick keep their content width (flex-fill
+                only expands inside the inner flex container, which is
+                itself a non-growing flex item).
+                The Delete wrapper gets ms-md-auto to push it right;
+                the button fills the wrapper (w-100), so it sizes to
+                its content.
+            -->
+            <div class="d-md-flex align-items-center gap-2">
 
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              title="Pick a replacement meal from the list"
-              (click)="openPicker(i)"
-            >
-              📋 Pick meal
-            </button>
+              <!-- Random + Pick: always a flex row -->
+              <div class="d-flex gap-2 mb-2 mb-md-0">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary flex-fill"
+                  title="Replace with a random meal"
+                  (click)="replaceRandom(i)"
+                >
+                  🎲 Random
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary flex-fill"
+                  title="Pick a replacement meal from the list"
+                  (click)="openPicker(i)"
+                >
+                  📋 Pick meal
+                </button>
+              </div>
+
+              <!--
+                Delete wrapper: block (full-width) on small; a
+                flex item pushed to the right on md+.  The button
+                is w-100 so it fills the wrapper — on md+ the
+                wrapper shrinks to the button's content width.
+              -->
+              <div class="ms-md-auto">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger w-100"
+                  title="Delete this day from the plan"
+                  aria-label="Delete this day from the plan"
+                  (click)="deleteEntry(i)"
+                >
+                  🗑 Delete
+                </button>
+              </div>
+
+            </div>
           </div>
 
         </div>
+        <!-- end .meal-card -->
+
+        </div>
+        <!-- end .plan-row -->
       }
+
+      <!-- + button after the last meal -->
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-success w-100"
+        title="Add a day after the plan"
+        (click)="appendDay()"
+      >+</button>
     </div>
+    <!-- end .plan-list -->
   }
 }
 
@@ -327,12 +388,10 @@
         <!--
           Replacement-mode checkbox — only visible when the entry being
           replaced is a two-day (leftovers) entry.
-          Checked  = must pick another leftovers meal (2-day stay).
-          Unchecked = must pick a single meal (entry splits; day 2
-                      gets a random single meal automatically).
+          Not a modal-body so it stays fixed above the scrollable grid.
         -->
         @if (isPickerForLeftovers()) {
-          <div class="modal-body border-bottom py-3">
+          <div class="border-bottom px-4 py-3">
             <div class="form-check">
               <input
                 type="checkbox"
@@ -357,13 +416,31 @@
           </div>
         }
 
+        <!-- Search bar (fixed, not inside modal-body so it doesn't scroll) -->
+        <div class="border-bottom px-4 py-2">
+          <input
+            type="search"
+            class="form-control"
+            placeholder="Search meals…"
+            aria-label="Search meals"
+            [value]="pickerSearch()"
+            (input)="pickerSearch.set($any($event.target).value)"
+          />
+        </div>
+
         <!-- Meal grid -->
         <div class="modal-body">
+          <!--
+            row-cols-* + align-items-stretch: every column stretches
+            to the height of the tallest cell in the same row, so
+            all cards in a row share the same height.
+          -->
           <div
-            class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2"
+            class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2
+                   align-items-stretch"
           >
-            @for (meal of allMeals(); track meal.title) {
-              <div class="col">
+            @for (meal of pickerFilteredMeals(); track meal.title) {
+              <div class="col d-flex">
                 <!--
                   Button states:
                   • Selectable, not in plan  → green outline
@@ -372,13 +449,19 @@
                   • Not selectable           → light bg + muted text
                                                + disabled
 
-                  "In plan" meals are still clickable so the user can
-                  intentionally repeat a meal; they are merely greyed
-                  to make their current use visible.
+                  h-100 d-flex flex-column: button grows to fill the
+                  equal-height column; badge row is pushed to the
+                  bottom with mt-auto.
+
+                  pickerTagClass: adds a coloured inset left-border
+                  matching the meal's primary tag (cyan = leftovers,
+                  yellow = convenience).
                 -->
                 <button
                   type="button"
-                  class="btn w-100 text-start py-2"
+                  class="picker-btn btn w-100 text-start py-2
+                         h-100 d-flex flex-column"
+                  [class]="pickerTagClass(meal)"
                   [class.btn-outline-success]="
                     isPickerSelectable(meal) &&
                     !pickerMealsInPlan().has(meal.title)
@@ -395,8 +478,10 @@
                   [disabled]="!isPickerSelectable(meal)"
                   (click)="confirmPick(meal)"
                 >
-                  <span class="d-block">{{ meal.title }}</span>
-                  <span class="d-flex gap-1 flex-wrap mt-1">
+                  <span class="d-block fw-semibold">
+                    {{ meal.title }}
+                  </span>
+                  <span class="d-flex gap-1 flex-wrap mt-auto pt-2">
                     @if (meal.tags?.includes('leftovers')) {
                       <span class="badge bg-info text-dark">
                         leftovers
@@ -414,6 +499,12 @@
                     }
                   </span>
                 </button>
+              </div>
+            }
+
+            @if (pickerFilteredMeals().length === 0) {
+              <div class="col-12 text-center text-muted py-4">
+                No meals match "{{ pickerSearch() }}".
               </div>
             }
           </div>
